@@ -9,13 +9,15 @@ In this simple RPG game, the hero fights the goblin. He has the options to:
 
 
 class Character:
-    def __init__(self, health, power):
+    # When a keyword argument is used, all arguments that follow must be a keyword argument
+    # ex: name=None
+    def __init__(self, name, health, power):
+        self.name = name if name else self.__class__.__name__.lower()
         self.health = health
         self.power = power
 
     def __str__(self):
-        return self.__class__.__name__
-        # TODO: return "goblin" or "you" instead of class name
+        return self.name
 
     def attack(self, other_character):
         other_character.health -= self.power
@@ -31,16 +33,19 @@ class Character:
 
 
 class Hero(Character):
-    def __init__(self, health, power):
-        super().__init__(health, power)
+    def __init__(self, name, health, power, coins=20):
+        super().__init__(name, health, power)
 
     def attack(self, goblin):
         super().attack(goblin)
 
+    def buy(self, item):
+        self.coins -= item
+
 
 class Goblin(Character):
-    def __init__(self, health, power):
-        super().__init__(health, power)
+    def __init__(self, name, health, power):
+        super().__init__(name, health, power)
 
     def attack(self, hero):
         hero.health -= self.power
@@ -52,9 +57,42 @@ class Goblin(Character):
             print("The goblin is dead.")
 
 
+class Shadow(Character):
+    pass
+
+
+class Zombie(Character):
+    pass
+
+
+class Wizard(Character):
+    pass
+
+
+class Archer(Character):
+    pass
+
+
+class Scribe(Character):
+    pass
+
+
+class Store:
+    # class variable shared across all instances of a class
+    items = ["Tonic", "Sword"]
+
+    def __init__(self, name):
+        # instance variable, which is unique to each object
+        self.name = name
+
+    def do_shopping(self):
+        print(f"Welcome! You have a balance of {Hero.coins} coins.")
+        print(f"We have {", ".join(self.items)} in stock.")
+
+
 def main():
-    hero = Hero(health=10, power=5)
-    goblin = Goblin(health=6, power=2)
+    hero = Hero(name="you", health=10, power=5)
+    goblin = Goblin(name="the goblin", health=6, power=2)
 
     while goblin.alive() and hero.alive():
         print(f"You have {hero.health} health and {hero.power} power.")
