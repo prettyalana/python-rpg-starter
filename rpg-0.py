@@ -8,44 +8,49 @@ In this simple RPG game, the hero fights the goblin. He has the options to:
 """
 
 
-class Hero:
+class Character:
     def __init__(self, health, power):
         self.health = health
         self.power = power
-        
-    def attack(self, goblin):
-        print(f"You do {self.power} damage to the goblin.")
-        goblin.health -= self.power
-            
+
+    def __str__(self):
+        return self.__class__.__name__
+        # TODO: return "goblin" or "you" instead of class name
+
+    def attack(self, other_character):
+        other_character.health -= self.power
+        print(f"You do {self.power} damage to {other_character}.")
+
     def alive(self):
         if self.health > 0:
             return True
-        
+
     def print_status(self):
         if self.health <= 0:
-            print("You are dead.")
-        
-           
-        
-class Goblin:
+            print(f"{self} is dead.")
+
+
+class Hero(Character):
     def __init__(self, health, power):
-        self.health = health
-        self.power = power
-    
+        super().__init__(health, power)
+
+    def attack(self, goblin):
+        super().attack(goblin)
+
+
+class Goblin(Character):
+    def __init__(self, health, power):
+        super().__init__(health, power)
+
     def attack(self, hero):
         hero.health -= self.power
         damage = self.power
         print(f"The goblin does {damage} damage to you.")
-            
-    def alive(self):
-        if self.health > 0:
-            return True
-    
+
     def print_status(self):
         if self.health <= 0:
             print("The goblin is dead.")
-        
-        
+
 
 def main():
     hero = Hero(health=10, power=5)
@@ -59,7 +64,9 @@ def main():
         print("1. fight goblin")
         print("2. do nothing")
         print("3. flee")
-        print("> ",)
+        print(
+            "> ",
+        )
         user_input = input()
         if user_input == "1":
             # Hero attacks goblin
@@ -76,6 +83,6 @@ def main():
         if goblin.health > 0:
             goblin.attack(hero)
             hero.print_status()
-            
+
 
 main()
