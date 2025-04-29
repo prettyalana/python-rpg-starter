@@ -7,6 +7,8 @@ In this simple RPG game, the hero fights the goblin. He has the options to:
 
 """
 
+from random import random
+
 
 class Character:
     # When a keyword argument is used, all arguments that follow must be a keyword argument
@@ -21,7 +23,7 @@ class Character:
 
     def attack(self, other_character):
         other_character.health -= self.power
-        print(f"You do {self.power} damage to {other_character}.")
+        print(f"{self.name} does {self.power} damage to {other_character}.")
 
     def alive(self):
         if self.health > 0:
@@ -29,12 +31,25 @@ class Character:
 
     def print_status(self):
         if self.health <= 0:
-            print(f"{self} is dead.")
+            if self.name != "you":
+                print(f"{self} is dead.")
+            else:
+                print("You are dead.")
+
+
+class Enemy(Character):
+    def __init__(self, name, health, power, bounty):
+        super().__init__(name, health, power)
+        self.bounty = bounty
+
+    def attack(self, hero):
+        super().attack(hero)
 
 
 class Hero(Character):
-    def __init__(self, name, health, power, coins=20):
+    def __init__(self, name, health, power, coins):
         super().__init__(name, health, power)
+        self.coins = coins
 
     def attack(self, goblin):
         super().attack(goblin)
@@ -43,26 +58,26 @@ class Hero(Character):
         self.coins -= item
 
 
-class Goblin(Character):
-    def __init__(self, name, health, power):
-        super().__init__(name, health, power)
-
-    def attack(self, hero):
-        hero.health -= self.power
-        damage = self.power
-        print(f"The goblin does {damage} damage to you.")
-
-    def print_status(self):
-        if self.health <= 0:
-            print("The goblin is dead.")
+class Goblin(Enemy):
+    def __init__(self, name, health, power, bounty):
+        super().__init__(name, health, power, bounty)
 
 
-class Shadow(Character):
-    pass
+class Shadow(Enemy):
+    def __init__(self, name, health, power, bounty):
+        super().__init__(name, health, power, bounty)
+
+    def will_take_damage(self, damage_amount):
+        if random() < 0.1:
+            self.health -= damage_amount
 
 
-class Zombie(Character):
-    pass
+class Zombie(Enemy):
+    def __init__(self, name, health, power, bounty):
+        super().__init__(name, health, power, bounty)
+
+    def alive(self):
+        return True
 
 
 class Wizard(Character):
@@ -91,8 +106,10 @@ class Store:
 
 
 def main():
-    hero = Hero(name="you", health=10, power=5)
-    goblin = Goblin(name="the goblin", health=6, power=2)
+    hero = Hero(name="you", health=10, power=5, coins=20)
+    goblin = Goblin(name="the goblin", health=6, power=2, bounty=6)
+    shadow = Shadow(name="Shadow", health=1, power=1, bounty=5)
+    zombie = Zombie(name="Zombie", health=1, power=1, bounty=0)
 
     while goblin.alive() and hero.alive():
         print(f"You have {hero.health} health and {hero.power} power.")
